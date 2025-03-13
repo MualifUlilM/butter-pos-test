@@ -75,7 +75,7 @@ function toggleSignatureModal() {
               <div class="flex items-center justify-center gap-2">
                 <img
                   class="size-5 object-contain"
-                  src="../assets/img/svg/upload.svg"
+                  src="../../../assets/img/svg/upload.svg"
                   alt="Upload icon"
                 />
                 <div class="text-sm font-medium text-[#797979]">
@@ -110,7 +110,7 @@ function toggleSignatureModal() {
               <div class="flex items-center gap-3">
                 <img
                   class="cursor-pointer size-5"
-                  src="../assets/img/svg/edit.svg"
+                  src="../../../assets/img/svg/edit.svg"
                   alt="Edit icon"
                 />
                 <svg
@@ -157,7 +157,7 @@ function toggleSignatureModal() {
               <div class="flex items-center justify-center gap-2">
                 <img
                   class="size-5 object-contain"
-                  src="../assets/img/svg/upload.svg"
+                  src="../../../assets/img/svg/upload.svg"
                   alt="Upload icon"
                 />
                 <div class="text-sm font-medium text-[#797979]">
@@ -190,7 +190,7 @@ function toggleSignatureModal() {
               <div class="flex items-center gap-3">
                 <img
                   class="cursor-pointer size-5"
-                  src="../assets/img/svg/edit.svg"
+                  src="../../../assets/img/svg/edit.svg"
                   alt="Edit icon"
                 />
                 <svg
