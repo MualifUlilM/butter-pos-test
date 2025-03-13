@@ -53,7 +53,6 @@ function toggleSignatureModal() {
 </script>
 
 <template>
-  <p>{{ formStore }}</p>
   <section id="form_persetujuan">
     <form
       class="flex flex-col text-sm md:text-base gap-6 md:gap-10 text-[#080808] bg-white border border-[#EDEDED] p-4 md:p-5 rounded-lg"
