@@ -23,4 +23,8 @@ export const customLocalization = createI18n({
 })
 
 const app = createApp(App)
-app.use(customLocalization).use(Vue3Signature).use(createPinia()).use(router).mount('#app')
+app.use(customLocalization)
+app.use(Vue3Signature)
+app.use(createPinia())
+app.use(router)
+app.mount('#app')

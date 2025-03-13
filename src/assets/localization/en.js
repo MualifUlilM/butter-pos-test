@@ -96,4 +96,7 @@ export const ENLang = {
   berhasil_dikirim: 'Data Sent  Successfully',
   data_sudah_diterima:
     'The data has been received, our team will review it soon. Please check your email regularly for the updates, or feel free to contact us if you have any question',
+  modal_1: 'Delete',
+  modal_2: 'Cancel',
+  modal_3: 'Create Signature',
 }

@@ -60,7 +60,7 @@ const selanjutnya = useI18n().t('message.selanjutnya')
         <div class="flex items-center flex-col md:flex-row gap-3 md:gap-4">
           <ButtonsComponent
             class="md:order-1 order-2 rounded bg-white border border-[#B2B2B2] text-[#080808] py-3 px-6 text-center w-full font-semibold cursor-pointer"
-            v-if="route.hash != '#pendahuluan'"
+            v-if="route.hash != '#pendahuluan' && route.hash != '#form_persetujuan'"
             @click="previousTab(route, router)"
             :textButton="{ sebelumnya }"
             keyTranslate="sebelumnya"
@@ -71,11 +71,6 @@ const selanjutnya = useI18n().t('message.selanjutnya')
             @click="nextTab(route, router)"
             :textButton="{ selanjutnya }"
             keyTranslate="selanjutnya"
-          />
-          <ButtonsComponent
-            class="md:order-2 order-1 rounded bg-[#0433FF] border border-[#0433FF] text-white py-3 px-6 text-center w-full font-semibold cursor-pointer"
-            v-if="route.hash == '#form_persetujuan'"
-            textButton="Submit"
           />
         </div>
       </div>

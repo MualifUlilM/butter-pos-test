@@ -1,17 +1,40 @@
 <script setup>
+import { formStoreData } from '@/stores/formStore'
 import { ref } from 'vue'
+import { useRouter, useRoute } from 'vue-router'
+import { previousTab } from '@/assets/js/previousTab'
+import ButtonsComponent from '@/components/FormViewComponents/ButtonComponents/ButtonsComponent.vue'
+
+const formStore = formStoreData()
+const router = useRouter()
+const route = useRoute()
 
 const signaturePad = ref(null)
 
 function deleteSignature() {
+  formStore.setSignature(null)
   signaturePad.value.clear()
-  console.log(signaturePad.value.clearCanvas())
+}
+
+function saveSignature() {
+  formStore.setLoading(true)
+  setTimeout(() => {
+    formStore.setSignature(signaturePad.value.save('image/jpeg'))
+    formStore.setLoading(false)
+    signatureModal.value = 'hidden'
+  }, 500)
+}
+
+function submitForm() {
+  if (formStore.isValidated()) {
+    router.push('/success')
+  }
 }
 
 const bankDropDown = ref('hidden')
 
 function toggleBankDropDown() {
-  if (bankDropDown.value === 'hidden') {
+  if (bankDropDown.value == 'hidden') {
     bankDropDown.value = ''
   } else {
     bankDropDown.value = 'hidden'
@@ -30,6 +53,7 @@ function toggleSignatureModal() {
 </script>
 
 <template>
+  <p>{{ formStore }}</p>
   <section id="form_persetujuan">
     <form
       class="flex flex-col text-sm md:text-base gap-6 md:gap-10 text-[#080808] bg-white border border-[#EDEDED] p-4 md:p-5 rounded-lg"
@@ -44,6 +68,7 @@ function toggleSignatureModal() {
               >{{ $t('message.formPersetujuan_2') }}
             </label>
             <input
+              v-model="formStore.namaLengkap"
               type="text"
               id="nama_lengkap"
               placeholder="Nama lengkap"
@@ -57,6 +82,7 @@ function toggleSignatureModal() {
               >{{ $t('message.formPersetujuan_3') }}
             </label>
             <input
+              v-model="formStore.nomorIdentitas"
               type="number"
               id="nomor_identitas"
               placeholder="1234567890"
@@ -71,7 +97,16 @@ function toggleSignatureModal() {
               for="upload_ktp"
               class="block rounded-lg bg-[#F8F8F8] border border-dashed border-[#D6D6D6] p-[18px] cursor-pointer"
             >
-              <input id="upload_ktp" type="file" hidden />
+              <input
+                id="upload_ktp"
+                type="file"
+                hidden
+                @change="
+                  (event) => {
+                    formStore.setUploadKTP(event.target.files[0])
+                  }
+                "
+              />
               <div class="flex items-center justify-center gap-2">
                 <img
                   class="size-5 object-contain"
@@ -139,6 +174,7 @@ function toggleSignatureModal() {
               >{{ $t('message.formPersetujuan_6') }}
             </label>
             <input
+              v-model="formStore.nomorNPWP"
               type="number"
               id="nomor_npwp"
               placeholder="1234567890"
@@ -153,7 +189,16 @@ function toggleSignatureModal() {
               for="upload_npwp"
               class="block rounded-lg bg-[#F8F8F8] border border-dashed border-[#D6D6D6] p-[18px] cursor-pointer"
             >
-              <input id="upload_npwp" type="file" hidden />
+              <input
+                id="upload_npwp"
+                type="file"
+                hidden
+                @change="
+                  (event) => {
+                    formStore.setUploadNPWP(event.target.files[0])
+                  }
+                "
+              />
               <div class="flex items-center justify-center gap-2">
                 <img
                   class="size-5 object-contain"
@@ -250,6 +295,7 @@ function toggleSignatureModal() {
                 +62
               </div>
               <input
+                v-model="formStore.nomorWA"
                 type="number"
                 id="nomor_wa"
                 placeholder="1234567890"
@@ -268,6 +314,7 @@ function toggleSignatureModal() {
               <span class="text-[#989898]">{{ $t('message.formPersetujuan_12') }}</span></label
             >
             <input
+              v-model="formStore.namaPerusahaan"
               type="text"
               id="nama_perusahaan"
               placeholder="Nama perusahaan"
@@ -281,6 +328,7 @@ function toggleSignatureModal() {
               >{{ $t('message.formPersetujuan_13') }}
             </label>
             <input
+              v-model="formStore.namaPenanggungJawab"
               type="text"
               id="nama_penanggung_jawab"
               placeholder="Nama penanggung jawab"
@@ -293,6 +341,7 @@ function toggleSignatureModal() {
               <span class="text-[#989898]">{{ $t('message.formPersetujuan_15') }}</span></label
             >
             <input
+              v-model="formStore.email"
               type="text"
               id="email"
               placeholder="Alamat email"
@@ -303,6 +352,7 @@ function toggleSignatureModal() {
       </div>
       <div>
         <div class="text-lg md:text-xl font-bold mb-3">{{ $t('message.formPersetujuan_16') }}</div>
+        <!-- bank dropdown -->
         <div class="space-y-4">
           <div @click="toggleBankDropDown()">
             <label class="font-medium block after:content-['*'] after:text-[#E21717] mb-2"
@@ -358,34 +408,114 @@ function toggleSignatureModal() {
                   />
                 </div>
                 <div class="-mx-4 max-h-[216px] overflow-y-auto">
-                  <div class="dropdown-item py-2 px-4 cursor-pointer text-sm text-[#080808]">
+                  <div
+                    class="dropdown-item py-2 px-4 cursor-pointer text-sm text-[#080808]"
+                    @click="
+                      () => {
+                        formStore.setNamaBank('Bank Syariah Indonesia')
+                        toggleBankDropDown()
+                      }
+                    "
+                  >
                     Bank Syariah Indonesia
                   </div>
-                  <div class="dropdown-item py-2 px-4 cursor-pointer text-sm text-[#080808]">
+                  <div
+                    class="dropdown-item py-2 px-4 cursor-pointer text-sm text-[#080808]"
+                    @click="
+                      () => {
+                        formStore.setNamaBank('Bank Rakyat Indonesia')
+                        toggleBankDropDown()
+                      }
+                    "
+                  >
                     Bank Rakyat Indonesia
                   </div>
-                  <div class="dropdown-item py-2 px-4 cursor-pointer text-sm text-[#080808]">
+                  <div
+                    class="dropdown-item py-2 px-4 cursor-pointer text-sm text-[#080808]"
+                    @click="
+                      () => {
+                        formStore.setNamaBank('Bank Tabungan Negara')
+                        toggleBankDropDown()
+                      }
+                    "
+                  >
                     Bank Tabungan Negara
                   </div>
-                  <div class="dropdown-item py-2 px-4 cursor-pointer text-sm text-[#080808]">
+                  <div
+                    class="dropdown-item py-2 px-4 cursor-pointer text-sm text-[#080808]"
+                    @click="
+                      () => {
+                        formStore.setNamaBank('Bank Central Asia')
+                        toggleBankDropDown()
+                      }
+                    "
+                  >
                     Bank Central Asia
                   </div>
-                  <div class="dropdown-item py-2 px-4 cursor-pointer text-sm text-[#080808]">
+                  <div
+                    class="dropdown-item py-2 px-4 cursor-pointer text-sm text-[#080808]"
+                    @click="
+                      () => {
+                        formStore.setNamaBank('Bank CIMB Niaga')
+                        toggleBankDropDown()
+                      }
+                    "
+                  >
                     Bank CIMB Niaga
                   </div>
-                  <div class="dropdown-item py-2 px-4 cursor-pointer text-sm text-[#080808]">
+                  <div
+                    class="dropdown-item py-2 px-4 cursor-pointer text-sm text-[#080808]"
+                    @click="
+                      () => {
+                        formStore.setNamaBank('Bank Syariah Indonesia')
+                        toggleBankDropDown()
+                      }
+                    "
+                  >
                     Bank Syariah Indonesia
                   </div>
-                  <div class="dropdown-item py-2 px-4 cursor-pointer text-sm text-[#080808]">
+                  <div
+                    class="dropdown-item py-2 px-4 cursor-pointer text-sm text-[#080808]"
+                    @click="
+                      () => {
+                        formStore.setNamaBank('Bank Rakyat Indonesia')
+                        toggleBankDropDown()
+                      }
+                    "
+                  >
                     Bank Rakyat Indonesia
                   </div>
-                  <div class="dropdown-item py-2 px-4 cursor-pointer text-sm text-[#080808]">
+                  <div
+                    class="dropdown-item py-2 px-4 cursor-pointer text-sm text-[#080808]"
+                    @click="
+                      () => {
+                        formStore.setNamaBank('Bank Tabungan Negara')
+                        toggleBankDropDown()
+                      }
+                    "
+                  >
                     Bank Tabungan Negara
                   </div>
-                  <div class="dropdown-item py-2 px-4 cursor-pointer text-sm text-[#080808]">
+                  <div
+                    class="dropdown-item py-2 px-4 cursor-pointer text-sm text-[#080808]"
+                    @click="
+                      () => {
+                        formStore.setNamaBank('Bank Central Asia')
+                        toggleBankDropDown()
+                      }
+                    "
+                  >
                     Bank Central Asia
                   </div>
-                  <div class="dropdown-item py-2 px-4 cursor-pointer text-sm text-[#080808]">
+                  <div
+                    class="dropdown-item py-2 px-4 cursor-pointer text-sm text-[#080808]"
+                    @click="
+                      () => {
+                        formStore.setNamaBank('Bank CIMB Niaga')
+                        toggleBankDropDown()
+                      }
+                    "
+                  >
                     Bank CIMB Niaga
                   </div>
                 </div>
@@ -400,6 +530,7 @@ function toggleSignatureModal() {
             </label>
             <div class="relative">
               <input
+                v-model="formStore.nomorRekening"
                 type="text"
                 id="nomor_rekening"
                 placeholder="012345678912"
@@ -422,6 +553,7 @@ function toggleSignatureModal() {
               >{{ $t('message.formPersetujuan_22') }}
             </label>
             <input
+              v-model="formStore.namaPemilikRekening"
               type="text"
               id="nama_pemilik_rekening"
               placeholder="-"
@@ -446,7 +578,13 @@ function toggleSignatureModal() {
       <div
         class="mt-3 relative cursor-pointer flex items-center justify-center gap-2 h-[164px] border border-dashed border-[#0433FF] rounded-lg"
       >
-        <!-- <VueSignaturePad class="w-full" height="164px" ref="signaturePad" /> -->
+        <img
+          v-if="formStore.signature != null"
+          class="w-36 h-full max-h-[108px] object-contain"
+          :src="formStore.signature"
+          alt="Signage"
+        />
+        <!-- <img class="size-5" src="../../../assets/img/svg/edit-2.svg" alt="Edit icon" /> -->
         <div class="absolute bottom-3 md:bottom-4 right-3 md:right-4 flex items-center gap-4">
           <button class="flex items-center gap-2 cursor-pointer">
             <img class="size-5" src="../../../assets/img/svg/edit-2.svg" alt="Edit icon" />
@@ -475,6 +613,21 @@ function toggleSignatureModal() {
       </div>
     </div>
   </section>
+  <div class="flex items-center flex-col md:flex-row gap-3 md:gap-4">
+    <ButtonsComponent
+      class="md:order-1 order-2 rounded bg-white border border-[#B2B2B2] text-[#080808] py-3 px-6 text-center w-full font-semibold cursor-pointer"
+      v-if="route.hash != '#pendahuluan' && route.hash != '#form_persetujuan'"
+      @click="previousTab(route, router)"
+      :textButton="{ sebelumnya }"
+      keyTranslate="sebelumnya"
+    />
+    <ButtonsComponent
+      class="md:order-2 order-1 rounded bg-[#0433FF] border border-[#0433FF] text-white py-3 px-6 text-center w-full font-semibold cursor-pointer"
+      v-if="route.hash == '#form_persetujuan'"
+      @click="submitForm()"
+      textButton="Submit"
+    />
+  </div>
 
   <!-- Signage modal -->
 
@@ -486,7 +639,9 @@ function toggleSignatureModal() {
       class="modal-content bg-white rounded-t-2xl md:rounded-lg px-4 pt-4 pb-6 md:p-6 w-full md:w-[800px]"
     >
       <div class="flex items-center justify-between mb-5">
-        <div class="text-lg md:text-xl font-semibold text-[#080808]">Buat Tanda Tangan</div>
+        <div class="text-lg md:text-xl font-semibold text-[#080808]">
+          {{ $t('message.modal_3') }}
+        </div>
         <button class="modal-close cursor-pointer size-5 md:size-6" @click="toggleSignatureModal()">
           <svg
             class="size-6 text-[#525252]"
@@ -503,23 +658,30 @@ function toggleSignatureModal() {
         </button>
       </div>
       <div class="mb-6">
-        <Vue3Signature ref="signaturePad" h="220px"></Vue3Signature>
-        <!-- <VueSignaturePad class="w-full" height="220px" :ref="signaturePad" /> -->
-        <!-- Gambar tanda tangan di sini -->
-        <!-- text-[#989898] -->`
+        <div
+          class="w-full border border-[#EDEDED] h-[220px] flex items-center justify-center rounded-lg"
+        >
+          <Vue3Signature
+            ref="signaturePad"
+            :w="'752px'"
+            h="220px"
+            :disabled="false"
+          ></Vue3Signature>
+        </div>
         <div
           class="mt-3 bg-[#F8F8F8] border border-[#EDEDED] h-[220px] pt-5 md:pt-0 flex items-start md:items-center justify-center rounded-lg relative"
         >
           <img
+            v-if="formStore.signature != null"
             class="size-full max-h-[150px] md:max-h-[180px] object-contain"
-            src="../../../assets/img/signage.svg"
+            :src="formStore.signature"
             alt="Signage"
           />
           <button
             class="absolute bottom-6 right-6 text-sm font-semibold text-[#CA0A0A]"
             @click="deleteSignature()"
           >
-            Hapus
+            {{ $t('message.modal_1') }}
           </button>
         </div>
       </div>
@@ -528,12 +690,34 @@ function toggleSignatureModal() {
           @click="toggleSignatureModal()"
           class="order-2 md:order-1 modal-close cursor-pointer rounded py-3 px-6 bg-white border border-[#B2B2B2] font-semibold text-[#080808]"
         >
-          Batal
+          {{ $t('message.modal_2') }}
         </button>
         <button
+          @click="saveSignature()"
           class="order-1 md:order-2 cursor-pointer rounded py-3 px-6 bg-[#EDEDED] font-semibold text-[#B2B2B2]"
         >
-          Buat Tanda Tangan
+          <div v-if="formStore.loading == true" role="status">
+            <svg
+              aria-hidden="true"
+              class="w-8 h-8 text-gray-200 animate-spin dark:text-gray-600 fill-blue-600"
+              viewBox="0 0 100 101"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M100 50.5908C100 78.2051 77.6142 100.591 50 100.591C22.3858 100.591 0 78.2051 0 50.5908C0 22.9766 22.3858 0.59082 50 0.59082C77.6142 0.59082 100 22.9766 100 50.5908ZM9.08144 50.5908C9.08144 73.1895 27.4013 91.5094 50 91.5094C72.5987 91.5094 90.9186 73.1895 90.9186 50.5908C90.9186 27.9921 72.5987 9.67226 50 9.67226C27.4013 9.67226 9.08144 27.9921 9.08144 50.5908Z"
+                fill="currentColor"
+              />
+              <path
+                d="M93.9676 39.0409C96.393 38.4038 97.8624 35.9116 97.0079 33.5539C95.2932 28.8227 92.871 24.3692 89.8167 20.348C85.8452 15.1192 80.8826 10.7238 75.2124 7.41289C69.5422 4.10194 63.2754 1.94025 56.7698 1.05124C51.7666 0.367541 46.6976 0.446843 41.7345 1.27873C39.2613 1.69328 37.813 4.19778 38.4501 6.62326C39.0873 9.04874 41.5694 10.4717 44.0505 10.1071C47.8511 9.54855 51.7191 9.52689 55.5402 10.0491C60.8642 10.7766 65.9928 12.5457 70.6331 15.2552C75.2735 17.9648 79.3347 21.5619 82.5849 25.841C84.9175 28.9121 86.7997 32.2913 88.1811 35.8758C89.083 38.2158 91.5421 39.6781 93.9676 39.0409Z"
+                fill="currentFill"
+              />
+            </svg>
+            <span class="sr-only">Loading...</span>
+          </div>
+          <p v-else>
+            {{ $t('message.modal_3') }}
+          </p>
         </button>
       </div>
     </div>

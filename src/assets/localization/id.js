@@ -96,4 +96,7 @@ export const IDLang = {
   berhasil_dikirim: 'Data Berhasil Dikirim',
   data_sudah_diterima:
     'Data sudah diterima, tim kami akan segera meninjaunya. Pantau email Anda untuk mengetahui informasi terbaru, atau jangan ragu untuk menghubungi kami jika Anda memiliki pertanyaan.',
+  modal_1: 'Hapus',
+  modal_2: 'Batal',
+  modal_3: 'Buat Tanda Tangan',
 }
