@@ -224,7 +224,7 @@ function toggleSignatureModal() {
               >
                 <img
                   class="size-6"
-                  src="../assets/img/svg/flag-indonesia.svg"
+                  src="../../../assets/img/svg/flag-indonesia.svg"
                   alt="Flag indonesia"
                 />
                 <svg
@@ -503,11 +503,7 @@ function toggleSignatureModal() {
         </button>
       </div>
       <div class="mb-6">
-        <Vue3Signature
-          ref="signaturePad"
-          h="220px"
-          class="w-full bg-[#F8F8F8] border border-[#EDEDED] h-[220px] flex items-center justify-center rounded-lg"
-        ></Vue3Signature>
+        <Vue3Signature ref="signaturePad" h="220px"></Vue3Signature>
         <!-- <VueSignaturePad class="w-full" height="220px" :ref="signaturePad" /> -->
         <!-- Gambar tanda tangan di sini -->
         <!-- text-[#989898] -->`
@@ -516,7 +512,7 @@ function toggleSignatureModal() {
         >
           <img
             class="size-full max-h-[150px] md:max-h-[180px] object-contain"
-            src="../assets/img/signage.svg"
+            src="../../../assets/img/signage.svg"
             alt="Signage"
           />
           <button
